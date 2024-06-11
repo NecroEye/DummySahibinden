@@ -41,7 +41,7 @@ interface FipeAPI {
     ): Response<List<AnosModel>>
 
 
-    @GET("${Constants.BASE_URL}{carros}/{marca}/modelos/{codigo}/anos/{date}")
+    @GET("${Constants.BASE_URL}{carros}/marcas/{marca}/modelos/{codigo}/anos/{date}")
     suspend fun getDetailsOfVehicle(
         @Path("carros")
         type: VehicleType,

@@ -90,7 +90,7 @@ constructor(
                 emit(DataResponse.error("An error occurred"))
         }
         catch (e:Exception){
-            emit(DataResponse.error(e.message.toString()))
+            emit(DataResponse.error("Hata" + e.message.toString()))
         }
 
     }.flowOn(ioDispatcher)
