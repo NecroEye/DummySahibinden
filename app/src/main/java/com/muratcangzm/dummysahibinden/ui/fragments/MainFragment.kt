@@ -34,7 +34,9 @@ class MainFragment : Fragment() {
 
 
         viewModel.fetchVehicleByType(VehicleType.carros)
-
+        viewModel.fetchVehicleByBrandCode(type = VehicleType.carros, codigo = 59)
+        viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
+        viewModel.fetchVehicleDetails(VehicleType.carros, 59, 5940, "2014-3")
         return binding.root
     }
 
@@ -45,18 +47,49 @@ class MainFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
 
-            viewModel.vehicleData.collect {
+            launch {
+                viewModel.vehicleData.collect {
 
-                it?.let {
+                    it?.let {
 
-                    Log.d("Gelen Data: ", "${it.size}")
+                        Log.d("Gelen Data: ", "${it.size}")
 
-                } ?: Log.d("Gelen Data:", "Boş")
+                    } ?: Log.d("Gelen Data:", "Boş")
 
+                }
             }
-        }
-    }
 
+
+            launch {
+                viewModel.brandCodeData.collect {
+
+                    it?.let {
+                        Log.d("Gelen Brand Data: ", "${it.models.size}")
+                    } ?: Log.d("Gelen Brand Data:", "Boş")
+
+                }
+            }
+
+
+            launch {
+                viewModel.vehicleYearListData.collect {
+                    it?.let {
+                        Log.d("Gelen Year Data: ", "${it.size}")
+                    } ?: Log.d("Gelen Year Data:", "Boş")
+                }
+            }
+
+            launch {
+                viewModel.vehicleDetails.collect{
+                    it?.let {
+                        Log.d("Gelen Detail Data: ", it.brand)
+                    } ?:  Log.d("Gelen Detail Data: ", "Boş")
+                }
+            }
+
+        }
+
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -64,3 +97,7 @@ class MainFragment : Fragment() {
     }
 
 }
+
+
+
+

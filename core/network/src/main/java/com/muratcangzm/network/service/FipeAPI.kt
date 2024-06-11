@@ -4,6 +4,7 @@ import com.muratcangzm.Constants
 import com.muratcangzm.model.AnosModel
 import com.muratcangzm.model.CarMarcasModel
 import com.muratcangzm.model.ModelosModel
+import com.muratcangzm.model.ValorModel
 import com.muratcangzm.network.DataResponse
 import com.muratcangzm.network.mapper.VehicleType
 import kotlinx.coroutines.flow.Flow
@@ -16,24 +17,41 @@ interface FipeAPI {
     @GET("${Constants.BASE_URL}{carros}/marcas")
     suspend fun getVehiclesByType(
         @Path("carros")
-        type:VehicleType
+        type: VehicleType
     ): Response<List<CarMarcasModel>>
 
 
-
-    @GET("${Constants.BASE_URL}carros/marcas/{marca}/modelos")
+    @GET("${Constants.BASE_URL}{carros}/marcas/{marca}/modelos")
     suspend fun getCarModelsByBrandCode(
+        @Path("carros")
+        type: VehicleType,
         @Path("marca")
-        marca:Int  // getVehicleByType'in codigosu
-    ) : Response<ModelosModel>
+        marca: Int  // getVehicleByType'in codigosu
+    ): Response<ModelosModel>
 
-    @GET("${Constants.BASE_URL}carros/{marca}/modelos/{codigo}/anos")
+
+    @GET("${Constants.BASE_URL}{carros}/marcas/{marca}/modelos/{codigo}/anos")
     suspend fun getVehicleYearInformation(
-        @Path("marca") marca:Int,  // getVehicleByType'in codigo'su
-        @Path("codigo") codigo:Int // getCarModelsByBrandCode'un codigo'su
+        @Path("carros")
+        type: VehicleType,
+        @Path("marca")
+        marca: Int,  // getVehicleByType'in codigo'su
+        @Path("codigo")
+        codigo: Int // getCarModelsByBrandCode'un codigo'su
     ): Response<List<AnosModel>>
 
 
+    @GET("${Constants.BASE_URL}{carros}/{marca}/modelos/{codigo}/anos/{date}")
+    suspend fun getDetailsOfVehicle(
+        @Path("carros")
+        type: VehicleType,
+        @Path("marca")
+        marca: Int, // getVehicleByType'in codigo'su
+        @Path("codigo")
+        codigo: Int,  // getCarModelsByBrandCode'un codigo'su
+        @Path("date")
+        date: String   // getVehicleYearInformation'ın codigo'su
+    ): Response<ValorModel>
 
 
 }
