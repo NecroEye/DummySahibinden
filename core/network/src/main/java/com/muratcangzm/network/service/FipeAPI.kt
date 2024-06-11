@@ -6,6 +6,7 @@ import com.muratcangzm.model.ModelosModel
 import com.muratcangzm.network.DataResponse
 import com.muratcangzm.network.mapper.VehicleType
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -16,7 +17,7 @@ interface FipeAPI {
     suspend fun getVehiclesByType(
         @Path("carros")
         type:VehicleType
-    ): Flow<DataResponse<List<CarMarcasModel>>>
+    ): Response<List<CarMarcasModel>>
 
 
 
@@ -24,6 +25,6 @@ interface FipeAPI {
     suspend fun getCarModelsByBrandCode(
         @Path("marcas")
         marca:Int
-    ) : Flow<DataResponse<ModelosModel>>
+    ) : Response<ModelosModel>
 
 }

@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.hiltAndroid)
     id("androidx.navigation.safeargs")
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -46,7 +46,7 @@ dependencies {
 
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":core:data"))
+    implementation(project(":core:model"))
 
 
     implementation(libs.androidx.core.ktx)
@@ -59,11 +59,16 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.bundles.navigation)
-    implementation(libs.bundles.dagger)
     implementation(libs.bundles.ui)
 
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    testImplementation(libs.hilt.testing)
+
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
     kapt("androidx.room:room-compiler:2.6.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
     kapt("androidx.lifecycle:lifecycle-compiler:2.8.1")
 
 
