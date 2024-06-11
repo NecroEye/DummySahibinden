@@ -21,7 +21,6 @@ import javax.inject.Singleton
 object AppModule {
 
 
-
     @Provides
     @DefaultDispatcher
     fun provideDefaultDispatcher() = Dispatchers.Default
@@ -37,12 +36,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApplicationContext(@ApplicationContext application: Application): Context{
+    fun provideApplicationContext(@ApplicationContext application: Application): Context {
         return application.applicationContext
 
     }
 
 
+    @Singleton
+    @Provides
+    fun provideFipeRepository(
+        api: FipeAPI,
+        @IODispatcher ioDispatcher: CoroutineDispatcher
+    ): FipeRepository {
+        return FipeRepository(api, ioDispatcher)
+    }
 
 
 }

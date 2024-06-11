@@ -15,10 +15,32 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+@HiltViewModel
 class MainViewModel
- : ViewModel() {
+@Inject
+constructor(private val repository: FipeRepository) : ViewModel() {
 
+    private var mutableVehicleData = MutableStateFlow<List<CarMarcasModel>?>(emptyList())
+    val vehicleData: StateFlow<List<CarMarcasModel>?> get() = mutableVehicleData.asStateFlow()
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.d("viewModel Error", throwable.message.toString())
+    }
+
+    fun fetchVehicleByType(type: VehicleType) {
+
+        viewModelScope.launch(exceptionHandler) {
+            repository.getVehicleListByType(type).collect { result ->
+                mutableVehicleData.value = result.data
+            }
+        }
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
+    }
 
 
 }

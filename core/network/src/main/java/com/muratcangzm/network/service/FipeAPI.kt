@@ -1,6 +1,7 @@
 package com.muratcangzm.network.service
 
 import com.muratcangzm.Constants
+import com.muratcangzm.model.AnosModel
 import com.muratcangzm.model.CarMarcasModel
 import com.muratcangzm.model.ModelosModel
 import com.muratcangzm.network.DataResponse
@@ -12,8 +13,7 @@ import retrofit2.http.Path
 
 interface FipeAPI {
 
-
-    @GET("${Constants.BASE_URL}/{carros}/marcas")
+    @GET("${Constants.BASE_URL}{carros}/marcas")
     suspend fun getVehiclesByType(
         @Path("carros")
         type:VehicleType
@@ -21,10 +21,19 @@ interface FipeAPI {
 
 
 
-    @GET("${Constants.BASE_URL}/carros/marcas/{marca}/modelos")
+    @GET("${Constants.BASE_URL}carros/marcas/{marca}/modelos")
     suspend fun getCarModelsByBrandCode(
-        @Path("marcas")
-        marca:Int
+        @Path("marca")
+        marca:Int  // getVehicleByType'in codigosu
     ) : Response<ModelosModel>
+
+    @GET("${Constants.BASE_URL}carros/{marca}/modelos/{codigo}/anos")
+    suspend fun getVehicleYearInformation(
+        @Path("marca") marca:Int,  // getVehicleByType'in codigo'su
+        @Path("codigo") codigo:Int // getCarModelsByBrandCode'un codigo'su
+    ): Response<List<AnosModel>>
+
+
+
 
 }
