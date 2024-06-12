@@ -42,6 +42,7 @@ object AppModule {
     }
 
 
+
     @Singleton
     @Provides
     fun provideFipeRepository(

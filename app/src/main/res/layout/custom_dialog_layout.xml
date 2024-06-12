@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_dialog"
+    android:layout_width="370dp"
+    android:layout_height="270dp"
+    android:layout_gravity="center"
+    android:layout_margin="16dp"
+    android:elevation="10dp"
+    android:padding="1dp"
+    app:cardCornerRadius="20dp"
+    app:cardPreventCornerOverlap="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="1dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:ellipsize="end"
+            android:lines="2"
+            android:maxLines="2"
+            android:text="@string/dialog_text"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/carsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/grey"
+            android:text="@string/cars"
+            app:cornerRadius="7.5dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/motosButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="15dp"
+            android:backgroundTint="@color/grey"
+            android:text="@string/motorcycle"
+            app:cornerRadius="7.5dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/caminhoesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/grey"
+            android:text="@string/trucks"
+            app:cornerRadius="7.5dp" />
+
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+

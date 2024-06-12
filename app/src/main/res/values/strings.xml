@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Dummy Sahibinden</string>
+    <string name="cars">Cars</string>
+    <string name="motorcycle">Motorcycle</string>
+    <string name="trucks">Trucks</string>
+    <string name="dialog_text">Choose one of them according to what are you looking for</string>
 </resources>
