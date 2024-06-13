@@ -80,9 +80,9 @@ constructor(@ApplicationContext private val context: Context) :
             binding.apply {
 
                 when (type) {
-                    VehicleType.carros -> binding.vehicleType.text = "Car Name: "
-                    VehicleType.motos -> binding.vehicleType.text = "Motorcycle Name: "
-                    VehicleType.caminhoes -> binding.vehicleType.text = "Truck Name: "
+                    VehicleType.carros -> binding.vehicleType.text = "Car Brand: "
+                    VehicleType.motos -> binding.vehicleType.text = "Motorcycle Brand: "
+                    VehicleType.caminhoes -> binding.vehicleType.text = "Truck Brand: "
                 }
 
                 binding.vehicleNameHolderText.text = data.name.trim()
