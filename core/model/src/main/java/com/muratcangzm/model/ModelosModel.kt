@@ -24,7 +24,7 @@ data class ModelosModel(
     data class Models(
         @Expose
         @SerializedName("codigo")
-        val code:String,
+        val code:Int,
         @Expose
         @SerializedName("nome")
         val name:String,

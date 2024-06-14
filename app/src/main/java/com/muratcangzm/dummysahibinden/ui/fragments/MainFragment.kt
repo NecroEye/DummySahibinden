@@ -15,15 +15,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.muratcangzm.dummysahibinden.R
+import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.MainAdapter
 import com.muratcangzm.dummysahibinden.viewmodels.MainViewModel
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
-import kotlin.math.log
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -37,6 +37,7 @@ class MainFragment : Fragment() {
     lateinit var mainAdapter: MainAdapter
 
     private var vehicleType: VehicleType? = null
+    private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,9 +48,10 @@ class MainFragment : Fragment() {
         _binding = MainFragmentLayoutBinding.inflate(inflater, container, false)
 
         showCustomDialog()
+        mainAdapter.setFragmentNavigation(fragmentNavigator)
         setAdapter()
 
-        viewModel.fetchVehicleByBrandCode(type = VehicleType.carros, codigo = 59)
+
         viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
         viewModel.fetchVehicleDetails(VehicleType.carros, 59, 5940, "2014-3")
 
@@ -76,20 +78,9 @@ class MainFragment : Fragment() {
                                 this@MainFragment
                             )
                         }
-                        Log.d("Gelen Data: ", "${it.size}")
+                        Timber.tag("Gelen Data: ").d("${it.size}")
 
-                    } ?: Log.d("Gelen Data:", "Boş")
-
-                }
-            }
-
-
-            launch {
-                viewModel.brandCodeData.collect {
-
-                    it?.let {
-                        Log.d("Gelen Brand Data: ", "${it.models.size}")
-                    } ?: Log.d("Gelen Brand Data:", "Boş")
+                    } ?: Timber.tag("Gelen Data:").d("Boş")
 
                 }
             }
@@ -98,16 +89,16 @@ class MainFragment : Fragment() {
             launch {
                 viewModel.vehicleYearListData.collect {
                     it?.let {
-                        Log.d("Gelen Year Data: ", "${it.size}")
-                    } ?: Log.d("Gelen Year Data:", "Boş")
+                        Timber.tag("Gelen Year Data: ").d("${it.size}")
+                    } ?: Timber.tag("Gelen Year Data:").d("Boş")
                 }
             }
 
             launch {
                 viewModel.vehicleDetails.collect {
                     it?.let {
-                        Log.d("Gelen Detail Data: ", it.brand)
-                    } ?: Log.d("Gelen Detail Data: ", "Boş")
+                        Timber.tag("Gelen Detail Data: ").d(it.brand)
+                    } ?: Timber.tag("Gelen Detail Data: ").d("Boş")
                 }
             }
 
@@ -173,5 +164,7 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 
 }

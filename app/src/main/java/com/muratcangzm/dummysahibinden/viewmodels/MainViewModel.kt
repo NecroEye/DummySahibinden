@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,10 +29,6 @@ constructor(private val repository: FipeRepository) : ViewModel() {
     val vehicleData: StateFlow<List<CarMarcasModel>?> get() = mutableVehicleData.asStateFlow()
 
 
-    // Fetching vehicle according to its brand code
-    private var mutableBrandCodeData = MutableStateFlow<ModelosModel?>(null)
-    val brandCodeData: StateFlow<ModelosModel?> get() = mutableBrandCodeData.asStateFlow()
-
     // Fetching vehicle acc0rding to its year
     private var mutableVehicleYearListData = MutableStateFlow<List<AnosModel>?>(emptyList())
     val vehicleYearListData: StateFlow<List<AnosModel>?> get() = mutableVehicleYearListData.asStateFlow()
@@ -43,7 +40,7 @@ constructor(private val repository: FipeRepository) : ViewModel() {
 
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.d("viewModel Error", throwable.message.toString())
+        Timber.tag("viewModel Error").d(throwable.message.toString())
     }
     //Detail method - not working right now
     fun fetchVehicleDetails(type: VehicleType, marca:Int, codigo: Int, date:String){
@@ -69,17 +66,7 @@ constructor(private val repository: FipeRepository) : ViewModel() {
         }
     }
 
-    //brand code method
-    fun fetchVehicleByBrandCode(type: VehicleType, codigo:Int){
 
-        viewModelScope.launch(exceptionHandler) {
-            repository.getCarModelsByBrandCode(type = type, code =  codigo).collect{ result ->
-
-                mutableBrandCodeData.value = result.data
-
-            }
-        }
-    }
 
     //ordinary method
     fun fetchVehicleByType(type: VehicleType) {

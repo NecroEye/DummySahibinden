@@ -4,4 +4,5 @@
     <string name="motorcycle">Motorcycle</string>
     <string name="trucks">Trucks</string>
     <string name="dialog_text">Choose one of them according to what are you looking for</string>
+    <string name="empty">Empty</string>
 </resources>

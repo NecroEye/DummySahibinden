@@ -2,20 +2,18 @@ package com.muratcangzm.dummysahibinden.ui.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.muratcangzm.dummysahibinden.R
+import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainAdapterLayoutBinding
 import com.muratcangzm.model.CarMarcasModel
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.jvm.Throws
 
@@ -29,6 +27,9 @@ constructor(@ApplicationContext private val context: Context) :
     private lateinit var binding: MainAdapterLayoutBinding
     private lateinit var vehicleType: VehicleType
     private var currentFragment: Fragment? = null
+    private var navigationDestination: FragmentNavigator? = null
+
+    private val VIEW_TYPE_ITEM = 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainHolder {
 
@@ -58,20 +59,30 @@ constructor(@ApplicationContext private val context: Context) :
     ) {
 
         currentFragment = fragment
-        Log.d("Alınan Fragment", "$currentFragment")
+        Timber.tag("Alınan Fragment").d("$currentFragment")
 
         carMarcasModel?.let {
+
 
             mutableCarsModel = carMarcasModel.toMutableList()
             vehicleType = type
             notifyDataSetChanged()
 
 
-        } ?: emptyList<CarMarcasModel>()
+        } ?: run {
+            mutableCarsModel.clear()
+            notifyDataSetChanged()
+        }
     }
 
-    inner class MainHolder : RecyclerView.ViewHolder(binding.root) {
+    fun setFragmentNavigation(fragmentNav: FragmentNavigator) {
 
+        this.navigationDestination = fragmentNav
+
+    }
+
+
+    inner class MainHolder : RecyclerView.ViewHolder(binding.root) {
 
         fun setData(data: CarMarcasModel, type: VehicleType) {
 
@@ -89,15 +100,10 @@ constructor(@ApplicationContext private val context: Context) :
 
                 binding.cardLayout.setOnClickListener {
 
-                    val bundle = bundleOf("carTypeNumber" to data.id)
+                    navigationDestination?.navigateToExtendedFragment(type, data.id)
 
-                    //i hope it works
-                    navController
-                        .navigate(
-                            R.id.action_mainFragment_to_extendedFragment, bundle
-                        )
 
-                    Toast.makeText(context, "${data.name} clicked!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "${data.id} clicked!", Toast.LENGTH_SHORT).show()
 
                 }
 
@@ -107,17 +113,5 @@ constructor(@ApplicationContext private val context: Context) :
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun clearData() {
-        mutableCarsModel.clear()
-        mutableCarsModel = emptyList<CarMarcasModel>().toMutableList()
-        notifyDataSetChanged()
-    }
-
-
-    override fun onViewDetachedFromWindow(holder: MainHolder) {
-        super.onViewDetachedFromWindow(holder)
-        clearData()
-    }
 
 }

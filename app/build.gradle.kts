@@ -60,11 +60,12 @@ dependencies {
 
     implementation(libs.bundles.navigation)
     implementation(libs.bundles.ui)
-
+    implementation(libs.timber)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     testImplementation(libs.hilt.testing)
+
 
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
