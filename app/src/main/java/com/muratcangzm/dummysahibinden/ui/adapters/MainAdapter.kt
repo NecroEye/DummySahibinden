@@ -23,7 +23,7 @@ class MainAdapter
 constructor(@ApplicationContext private val context: Context) :
     RecyclerView.Adapter<MainAdapter.MainHolder>() {
 
-    private var mutableCarsModel = mutableListOf<CarMarcasModel>()
+    var mutableCarsModel = mutableListOf<CarMarcasModel>()
     private lateinit var binding: MainAdapterLayoutBinding
     private lateinit var vehicleType: VehicleType
     private var currentFragment: Fragment? = null

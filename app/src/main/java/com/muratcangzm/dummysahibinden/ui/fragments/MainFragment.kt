@@ -1,26 +1,33 @@
 package com.muratcangzm.dummysahibinden.ui.fragments
 
 import android.app.Dialog
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.core.view.isNotEmpty
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.muratcangzm.dummysahibinden.R
+import com.muratcangzm.dummysahibinden.common.listener.NetworkListener
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.MainAdapter
+import com.muratcangzm.dummysahibinden.utils.NetworkConnection
 import com.muratcangzm.dummysahibinden.viewmodels.MainViewModel
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,6 +46,10 @@ class MainFragment : Fragment() {
     private var vehicleType: VehicleType? = null
     private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
 
+    private lateinit var networkChangeReceiver: NetworkListener
+    private lateinit var networkDialog: Dialog
+    private lateinit var vehicleDialog: Dialog
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,7 +58,6 @@ class MainFragment : Fragment() {
 
         _binding = MainFragmentLayoutBinding.inflate(inflater, container, false)
 
-        showCustomDialog()
         mainAdapter.setFragmentNavigation(fragmentNavigator)
         setAdapter()
 
@@ -66,7 +76,7 @@ class MainFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
 
             launch {
-                viewModel.vehicleData.collect { list ->
+                viewModel.vehicleData.collectLatest { list ->
 
                     list?.let {
 
@@ -87,7 +97,7 @@ class MainFragment : Fragment() {
 
 
             launch {
-                viewModel.vehicleYearListData.collect {
+                viewModel.vehicleYearListData.collectLatest {
                     it?.let {
                         Timber.tag("Gelen Year Data: ").d("${it.size}")
                     } ?: Timber.tag("Gelen Year Data:").d("Boş")
@@ -95,7 +105,7 @@ class MainFragment : Fragment() {
             }
 
             launch {
-                viewModel.vehicleDetails.collect {
+                viewModel.vehicleDetails.collectLatest {
                     it?.let {
                         Timber.tag("Gelen Detail Data: ").d(it.brand)
                     } ?: Timber.tag("Gelen Detail Data: ").d("Boş")
@@ -103,48 +113,73 @@ class MainFragment : Fragment() {
             }
 
         }
-
     }
 
-    private fun showCustomDialog() {
+    private fun showVehicleDialog() {
+
+        if(!::vehicleDialog.isInitialized || !vehicleDialog.isShowing){
+            if(mainAdapter.mutableCarsModel.isEmpty()){
+
+                vehicleDialog = Dialog(requireContext())
+                vehicleDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                vehicleDialog.setCancelable(false)
+                vehicleDialog.setContentView(R.layout.custom_dialog_layout)
+                vehicleDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(false)
-        dialog.setContentView(R.layout.custom_dialog_layout)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                val carsButton: MaterialButton = vehicleDialog.findViewById(R.id.carsButton)
+                val motorButton: MaterialButton = vehicleDialog.findViewById(R.id.motosButton)
+                val truckButton: MaterialButton = vehicleDialog.findViewById(R.id.caminhoesButton)
+
+                carsButton.setOnClickListener {
+
+                    vehicleType = VehicleType.carros
+                    viewModel.fetchVehicleByType(VehicleType.carros)
 
 
-        val carsButton: MaterialButton = dialog.findViewById(R.id.carsButton)
-        val motorButton: MaterialButton = dialog.findViewById(R.id.motosButton)
-        val truckButton: MaterialButton = dialog.findViewById(R.id.caminhoesButton)
+                    vehicleDialog.dismiss()
+                }
+                motorButton.setOnClickListener {
 
-        carsButton.setOnClickListener {
+                    vehicleType = VehicleType.motos
+                    viewModel.fetchVehicleByType(VehicleType.motos)
 
-            vehicleType = VehicleType.carros
-            viewModel.fetchVehicleByType(VehicleType.carros)
+                    vehicleDialog.dismiss()
+                }
+                truckButton.setOnClickListener {
 
+                    vehicleType = VehicleType.caminhoes
+                    viewModel.fetchVehicleByType(VehicleType.caminhoes)
 
-            dialog.dismiss()
+                    vehicleDialog.dismiss()
+                }
+
+                vehicleDialog.show()
+
+            }
+
         }
-        motorButton.setOnClickListener {
+    }
 
-            vehicleType = VehicleType.motos
-            viewModel.fetchVehicleByType(VehicleType.motos)
+    private fun showNetworkDialog() {
 
-            dialog.dismiss()
+        if (!::networkDialog.isInitialized || !networkDialog.isShowing) {
+            networkDialog = Dialog(requireContext())
+            networkDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            networkDialog.setCancelable(false)
+            networkDialog.setContentView(R.layout.internet_listener_dialog)
+            networkDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            val retryButton: MaterialButton = networkDialog.findViewById(R.id.reconnectButton)
+
+            retryButton.setOnClickListener {
+                if (NetworkConnection.isNetworkAvailable(requireContext())) {
+                    showVehicleDialog()
+                    networkDialog.dismiss()
+                }
+            }
+            networkDialog.show()
         }
-        truckButton.setOnClickListener {
-
-            vehicleType = VehicleType.caminhoes
-            viewModel.fetchVehicleByType(VehicleType.caminhoes)
-
-            dialog.dismiss()
-        }
-
-        dialog.show()
-
     }
 
     private fun setAdapter() {
@@ -159,12 +194,38 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        networkChangeReceiver = NetworkListener { isConnected ->
+
+            if (isConnected) {
+                showVehicleDialog()
+            } else {
+                showNetworkDialog()
+            }
+        }
+
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        requireContext().registerReceiver(networkChangeReceiver, filter)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        requireContext().unregisterReceiver(networkChangeReceiver)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
 
+        if(::vehicleDialog.isInitialized)
+            vehicleDialog.dismiss()
+
+        if (::networkDialog.isInitialized)
+            vehicleDialog.dismiss()
+
+    }
 
 
 }
