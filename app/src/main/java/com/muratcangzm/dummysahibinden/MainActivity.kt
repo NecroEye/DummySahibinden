@@ -19,4 +19,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
     }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
 }
