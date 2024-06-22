@@ -6,4 +6,6 @@
     <string name="dialog_text">Choose one of them according to what are you looking for</string>
     <string name="empty">Empty</string>
     <string name="re_connect_again">Re-connect again</string>
+    <string name="leads_to_another_page">leads to another page</string>
+    <string name="model_list">Model List</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Visibility
 import com.google.android.material.button.MaterialButton
 import com.muratcangzm.dummysahibinden.R
 import com.muratcangzm.dummysahibinden.common.listener.NetworkListener
@@ -81,7 +82,8 @@ class MainFragment : Fragment() {
                     list?.let {
 
                         vehicleType?.let {
-
+                            binding.loadingLayout.realLayout.visibility = View.GONE
+                            binding.mainRecyclerView.visibility = View.VISIBLE
                             mainAdapter.submitCarMarcasModel(
                                 list,
                                 vehicleType!!,

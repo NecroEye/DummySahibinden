@@ -70,6 +70,10 @@ class ExtendedFragment : Fragment() {
 
                 it?.let {
 
+                    binding.extendedLoadingLayout.realLayout.visibility = View.GONE
+                    binding.extendedRecyclerView.visibility = View.VISIBLE
+                    binding.listTitle.visibility = View.VISIBLE
+
                     Timber.d("ikinci fragment ${it.models.size}")
                     extendedAdapter.setList(it, type!!, id!!)
 
