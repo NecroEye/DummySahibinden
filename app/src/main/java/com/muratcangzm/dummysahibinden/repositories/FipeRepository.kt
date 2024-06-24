@@ -22,7 +22,6 @@ constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-
     suspend fun getVehicleListByType(type: VehicleType): Flow<DataResponse<List<CarMarcasModel>>> =
         flow {
             try {

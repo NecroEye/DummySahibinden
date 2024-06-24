@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainAdapterLayoutBinding
@@ -29,7 +30,11 @@ constructor(@ApplicationContext private val context: Context) :
     private var currentFragment: Fragment? = null
     private var navigationDestination: FragmentNavigator? = null
 
-    private val VIEW_TYPE_ITEM = 1
+
+    companion object {
+        private const val VIEW_TYPE_ITEM = 1
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainHolder {
 
@@ -39,7 +44,7 @@ constructor(@ApplicationContext private val context: Context) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return position
+        return VIEW_TYPE_ITEM
     }
 
     @Throws(ArrayIndexOutOfBoundsException::class)
@@ -63,11 +68,11 @@ constructor(@ApplicationContext private val context: Context) :
 
         carMarcasModel?.let {
 
-
-            mutableCarsModel = carMarcasModel.toMutableList()
+            val diffResult = DiffUtil.calculateDiff(CarDiffUtils(mutableCarsModel, carMarcasModel))
+            mutableCarsModel.clear()
+            mutableCarsModel.addAll(carMarcasModel)
             vehicleType = type
-            notifyDataSetChanged()
-
+            diffResult.dispatchUpdatesTo(this)
 
         } ?: run {
             mutableCarsModel.clear()
@@ -113,5 +118,30 @@ constructor(@ApplicationContext private val context: Context) :
 
     }
 
+    inner class CarDiffUtils(
+        private val mutableOldList: List<CarMarcasModel>,
+        private val mutableNewList: List<CarMarcasModel>
+    ) : DiffUtil.Callback() {
+
+        @Throws(ArrayIndexOutOfBoundsException::class)
+        override fun getOldListSize(): Int {
+            return mutableOldList.size ?: 0
+        }
+
+        @Throws(ArrayIndexOutOfBoundsException::class)
+        override fun getNewListSize(): Int {
+            return mutableNewList.size ?: 0
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return mutableOldList[oldItemPosition].id == mutableNewList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return mutableOldList[oldItemPosition] == mutableNewList[newItemPosition]
+        }
+
+
+    }
 
 }

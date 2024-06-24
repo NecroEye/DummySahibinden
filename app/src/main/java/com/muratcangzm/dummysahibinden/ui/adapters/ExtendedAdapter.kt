@@ -6,6 +6,7 @@ import android.graphics.ColorSpace.Model
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.ExtendedAdapterLayoutBinding
@@ -21,7 +22,6 @@ class ExtendedAdapter
 constructor(@ApplicationContext private val context: Context) :
     RecyclerView.Adapter<ExtendedAdapter.ExtendedHolder>() {
 
-    //TODO use databinding later
 
     private lateinit var binding: ExtendedAdapterLayoutBinding
     private var modelosModelAdapter: ModelosModel? = null
@@ -29,6 +29,10 @@ constructor(@ApplicationContext private val context: Context) :
     private var type: VehicleType? = null
     private var id: Int? = null
 
+
+    companion object {
+        private const val VIEW_TYPE_ITEM = 1
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExtendedHolder {
 
@@ -44,27 +48,29 @@ constructor(@ApplicationContext private val context: Context) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return position
+        return VIEW_TYPE_ITEM
     }
 
     override fun onBindViewHolder(holder: ExtendedHolder, position: Int) {
 
-        holder.setData(
-            modelosModelAdapter!!.models[position],
-            modelosModelAdapter!!.years[position]
-        )
+        if (position < modelosModelAdapter?.models!!.size && position < modelosModelAdapter?.years!!.size)
+            holder.setData(
+                modelosModelAdapter!!.models[position],
+                modelosModelAdapter!!.years[position]
+            )
+        else
+            Timber.e("index $position which is out of bounds")
 
     }
 
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setList(modelosModel: ModelosModel, type: VehicleType, id: Int) {
 
+        modelosModelAdapter = modelosModel
+        val diffResult = DiffUtil.calculateDiff(DiffModelos(modelosModelAdapter!!, modelosModel))
         this.type = type
         this.id = id
-        modelosModelAdapter = modelosModel
-        notifyDataSetChanged()
-
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun setFragmentNavigation(fragmentNav: FragmentNavigator) {
@@ -72,7 +78,6 @@ constructor(@ApplicationContext private val context: Context) :
         this.fragmentNavigator = fragmentNav
 
     }
-
 
     inner class ExtendedHolder() : RecyclerView.ViewHolder(binding.root) {
 
@@ -83,17 +88,62 @@ constructor(@ApplicationContext private val context: Context) :
                 vehicleModelName.text = dataOne.name
                 yearText.text = dataTwo.name
 
-                Timber.d("settled Data: ${dataOne}")
+                Timber.d("settled Data: $dataOne")
 
                 extendedFragment.setOnClickListener {
 
-                     //TODO fix it later prepare smooth navigation data class for it
-                     //fragmentNavigator!!.navigateToDetails(type!!, id!!, dataOne.code, dataTwo.code)
-                    Toast.makeText(context, "clicked ${dataOne.name}", Toast.LENGTH_SHORT).show()
+                    type?.let { vehicleType ->
+                        id?.let { vehicleId ->
+
+                            fragmentNavigator?.navigateToDetails(
+                                vehicleType,
+                                vehicleId,
+                                dataOne.code,
+                                dataTwo.code
+                            )
+
+                            Toast.makeText(context, "clicked ${dataOne.name}", Toast.LENGTH_SHORT)
+                                .show()
+
+
+                        }
+                    } ?: run {
+                        Timber.e("navigation type or id is null")
+                        Toast.makeText(
+                            context,
+                            "Error: Navigation data missing",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
 
                 }
-
             }
         }
+    }
+
+    inner class DiffModelos(
+        private val oldModelosList: ModelosModel,
+        private val newModelosList: ModelosModel
+    ) : DiffUtil.Callback() {
+
+        @Throws(ArrayIndexOutOfBoundsException::class)
+        override fun getOldListSize(): Int {
+            return oldModelosList.models.size ?: 0
+        }
+
+        @Throws(ArrayIndexOutOfBoundsException::class)
+        override fun getNewListSize(): Int {
+            return newModelosList.models.size ?: 0
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldModelosList.models[oldItemPosition].name == newModelosList.models[newItemPosition].name
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldModelosList.models == newModelosList.models
+        }
+
     }
 }

@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.ExtendedFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.ExtendedAdapter
 import com.muratcangzm.dummysahibinden.viewmodels.ExtendedViewModel
@@ -30,7 +31,7 @@ class ExtendedFragment : Fragment() {
     @Inject
     lateinit var extendedAdapter: ExtendedAdapter
 
-
+    private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
     private val viewModel: ExtendedViewModel by viewModels()
 
     //private val args:ExtendedFragmentArgs by navArgs() doesn't work right now fix it later
@@ -42,6 +43,8 @@ class ExtendedFragment : Fragment() {
     ): View {
 
         _binding = ExtendedFragmentLayoutBinding.inflate(inflater, container, false)
+
+        extendedAdapter.setFragmentNavigation(fragmentNavigator)
 
         arguments?.let { args ->
             type = args.getSerializable("vehicleType") as VehicleType
