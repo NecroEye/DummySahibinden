@@ -4,18 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.navArgs
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.ExtendedFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.ExtendedAdapter
 import com.muratcangzm.dummysahibinden.viewmodels.ExtendedViewModel
+import com.muratcangzm.dummysahibinden.viewmodels.core.ViewModelFactory
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,10 +27,13 @@ class ExtendedFragment : Fragment() {
     private var id: Int? = null
 
     @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
     lateinit var extendedAdapter: ExtendedAdapter
 
     private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
-    private val viewModel: ExtendedViewModel by viewModels()
+    private val viewModel: ExtendedViewModel by viewModels { viewModelFactory }
 
     //private val args:ExtendedFragmentArgs by navArgs() doesn't work right now fix it later
 

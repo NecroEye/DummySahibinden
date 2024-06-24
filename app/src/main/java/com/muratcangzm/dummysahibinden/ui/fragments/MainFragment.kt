@@ -24,8 +24,10 @@ import com.muratcangzm.dummysahibinden.common.listener.NetworkListener
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.MainAdapter
+import com.muratcangzm.dummysahibinden.ui.fragments.core.BaseFragment
 import com.muratcangzm.dummysahibinden.utils.NetworkConnection
 import com.muratcangzm.dummysahibinden.viewmodels.MainViewModel
+import com.muratcangzm.dummysahibinden.viewmodels.core.ViewModelFactory
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -34,15 +36,18 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
 
-    private var _binding: MainFragmentLayoutBinding? = null
-    private val binding get() = _binding!!
+    override val layoutId: Int
+        get() = R.layout.main_fragment_layout
 
-    private val viewModel: MainViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
     lateinit var mainAdapter: MainAdapter
+
+    private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
     private var vehicleType: VehicleType? = null
     private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
@@ -51,27 +56,26 @@ class MainFragment : Fragment() {
     private lateinit var networkDialog: Dialog
     private lateinit var vehicleDialog: Dialog
 
-    override fun onCreateView(
+    override fun inflateBinding(
         inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        container: ViewGroup?
+    ): MainFragmentLayoutBinding {
 
-        _binding = MainFragmentLayoutBinding.inflate(inflater, container, false)
+        return MainFragmentLayoutBinding.inflate(inflater, container, false)
+    }
+
+    override fun MainFragmentLayoutBinding.initializeViews() {
+        //Not necessary in this fragment rn
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         mainAdapter.setFragmentNavigation(fragmentNavigator)
         setAdapter()
 
-
         viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
         viewModel.fetchVehicleDetails(VehicleType.carros, 59, 5940, "2014-3")
-
-        return binding.root
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -119,8 +123,8 @@ class MainFragment : Fragment() {
 
     private fun showVehicleDialog() {
 
-        if(!::vehicleDialog.isInitialized || !vehicleDialog.isShowing){
-            if(mainAdapter.mutableCarsModel.isEmpty()){
+        if (!::vehicleDialog.isInitialized || !vehicleDialog.isShowing) {
+            if (mainAdapter.mutableCarsModel.isEmpty()) {
 
                 vehicleDialog = Dialog(requireContext())
                 vehicleDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -219,15 +223,14 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
 
-        if(::vehicleDialog.isInitialized)
+        if (::vehicleDialog.isInitialized && vehicleDialog.isShowing)
             vehicleDialog.dismiss()
 
-        if (::networkDialog.isInitialized)
+        if (::networkDialog.isInitialized && networkDialog.isShowing)
             vehicleDialog.dismiss()
+
 
     }
-
 
 }

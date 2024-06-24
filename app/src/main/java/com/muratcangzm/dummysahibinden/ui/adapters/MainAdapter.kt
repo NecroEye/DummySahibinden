@@ -35,7 +35,6 @@ constructor(@ApplicationContext private val context: Context) :
         private const val VIEW_TYPE_ITEM = 1
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainHolder {
 
         binding = MainAdapterLayoutBinding.inflate(LayoutInflater.from(context), parent, false)
