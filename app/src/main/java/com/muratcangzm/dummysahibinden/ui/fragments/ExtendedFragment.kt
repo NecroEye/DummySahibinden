@@ -4,25 +4,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.annotation.LayoutRes
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
+import com.muratcangzm.dummysahibinden.R
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.ExtendedFragmentLayoutBinding
 import com.muratcangzm.dummysahibinden.ui.adapters.ExtendedAdapter
+import com.muratcangzm.dummysahibinden.ui.fragments.core.BaseFragment
 import com.muratcangzm.dummysahibinden.viewmodels.ExtendedViewModel
 import com.muratcangzm.dummysahibinden.viewmodels.core.ViewModelFactory
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExtendedFragment : Fragment() {
+class ExtendedFragment : BaseFragment<ExtendedFragmentLayoutBinding>() {
 
-    private var _binding: ExtendedFragmentLayoutBinding? = null
-    private val binding get() = _binding!!
+    @get:LayoutRes
+    override val layoutId: Int
+        get() = R.layout.extended_fragment_layout
+
+
     private var type: VehicleType? = null
     private var id: Int? = null
 
@@ -33,24 +41,35 @@ class ExtendedFragment : Fragment() {
     lateinit var extendedAdapter: ExtendedAdapter
 
     private val fragmentNavigator: FragmentNavigator by lazy { FragmentNavigator(this) }
+
+    @VisibleForTesting
     private val viewModel: ExtendedViewModel by viewModels { viewModelFactory }
 
-    //private val args:ExtendedFragmentArgs by navArgs() doesn't work right now fix it later
 
-    override fun onCreateView(
+    private val args: ExtendedFragmentArgs by navArgs()
+
+    private val exceptionHandler = CoroutineExceptionHandler{_, throwable ->
+        Timber.tag("Extended Fragment Coroutine Error").d(throwable.message.toString())
+    }
+
+    override fun inflateBinding(
         inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        container: ViewGroup?
+    ): ExtendedFragmentLayoutBinding {
+        return ExtendedFragmentLayoutBinding.inflate(inflater, container, false)
+    }
 
-        _binding = ExtendedFragmentLayoutBinding.inflate(inflater, container, false)
+    override fun ExtendedFragmentLayoutBinding.initializeViews() {
+        //not necessary in this class rn
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         extendedAdapter.setFragmentNavigation(fragmentNavigator)
 
-        arguments?.let { args ->
-            type = args.getSerializable("vehicleType") as VehicleType
-            id = args.getInt("id")
-        }
+        type = args.vehicleType
+        id = args.id
 
         viewModel.fetchVehicleByBrandCode(type = type!!, codigo = id!!)
 
@@ -58,17 +77,9 @@ class ExtendedFragment : Fragment() {
         Timber.d("receivedData: $type")
         Timber.d("receivedData: $id")
 
-
-        return binding.root
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         setAdapter()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(exceptionHandler) {
 
             viewModel.brandCodeData.collect {
 
@@ -99,7 +110,6 @@ class ExtendedFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        _binding = null
 
     }
 

@@ -12,8 +12,8 @@ import timber.log.Timber
 
 open class BaseViewModel : ViewModel() {
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, thorwable ->
-        Timber.tag("BaseViewModel Error").d(thorwable.message.toString())
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.tag("BaseViewModel Error").d(throwable.message.toString())
     }
 
     protected fun <T> MutableStateFlow<T>.fetchDataFromResponse(

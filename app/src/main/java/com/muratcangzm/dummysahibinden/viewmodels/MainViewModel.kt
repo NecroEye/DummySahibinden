@@ -33,21 +33,6 @@ constructor(private val repository: FipeRepository) : BaseViewModel() {
     private var mutableVehicleYearListData = MutableStateFlow<List<AnosModel>?>(emptyList())
     val vehicleYearListData: StateFlow<List<AnosModel>?> get() = mutableVehicleYearListData.asStateFlow()
 
-    //Fetching vehicle all details
-    private var mutableVehicleDetails = MutableStateFlow<ValorModel?>(null)
-    val vehicleDetails: StateFlow<ValorModel?> get() = mutableVehicleDetails.asStateFlow()
-
-
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.tag("viewModel Error").d(throwable.message.toString())
-    }
-
-    fun fetchVehicleDetails(type: VehicleType, marca: Int, codigo: Int, date: String) {
-
-        mutableVehicleDetails.fetchDataFromResponse {
-            repository.getVehicleDetails(type, marca, codigo, date)
-        }
-    }
 
     //year method
     fun fetchVehicleYearList(type: VehicleType, marca: Int, codigo: Int) {
@@ -65,11 +50,6 @@ constructor(private val repository: FipeRepository) : BaseViewModel() {
             repository.getVehicleListByType(type)
         }
 
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
     }
 
 

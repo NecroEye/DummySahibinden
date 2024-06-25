@@ -1,23 +1,20 @@
 package com.muratcangzm.dummysahibinden.ui.fragments
 
 import android.app.Dialog
-import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import androidx.core.view.isNotEmpty
-import androidx.fragment.app.Fragment
+import androidx.annotation.LayoutRes
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Visibility
 import com.google.android.material.button.MaterialButton
 import com.muratcangzm.dummysahibinden.R
 import com.muratcangzm.dummysahibinden.common.listener.NetworkListener
@@ -38,6 +35,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
 
+    @get:LayoutRes
     override val layoutId: Int
         get() = R.layout.main_fragment_layout
 
@@ -47,6 +45,7 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
     @Inject
     lateinit var mainAdapter: MainAdapter
 
+    @VisibleForTesting
     private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
     private var vehicleType: VehicleType? = null
@@ -75,8 +74,6 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
         setAdapter()
 
         viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
-        viewModel.fetchVehicleDetails(VehicleType.carros, 59, 5940, "2014-3")
-
 
         viewLifecycleOwner.lifecycleScope.launch {
 
@@ -107,14 +104,6 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
                     it?.let {
                         Timber.tag("Gelen Year Data: ").d("${it.size}")
                     } ?: Timber.tag("Gelen Year Data:").d("Boş")
-                }
-            }
-
-            launch {
-                viewModel.vehicleDetails.collectLatest {
-                    it?.let {
-                        Timber.tag("Gelen Detail Data: ").d(it.brand)
-                    } ?: Timber.tag("Gelen Detail Data: ").d("Boş")
                 }
             }
 

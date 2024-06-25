@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.muratcangzm.dummysahibinden.repositories.FipeRepository
+import com.muratcangzm.dummysahibinden.viewmodels.DetailsViewModel
 import com.muratcangzm.dummysahibinden.viewmodels.ExtendedViewModel
 import com.muratcangzm.dummysahibinden.viewmodels.MainViewModel
 import javax.inject.Inject
@@ -19,6 +20,10 @@ constructor(private val repository: FipeRepository)
         } else if (modelClass.isAssignableFrom(ExtendedViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return ExtendedViewModel(repository) as T
+        }
+        else if(modelClass.isAssignableFrom(DetailsViewModel::class.java)){
+            @Suppress("UNCHECKED_CAST")
+            return DetailsViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
