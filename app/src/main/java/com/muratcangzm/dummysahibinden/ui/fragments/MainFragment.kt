@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.viewModels
@@ -65,6 +66,7 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
 
     override fun MainFragmentLayoutBinding.initializeViews() {
         //Not necessary in this fragment rn
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,7 +74,7 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
 
         mainAdapter.setFragmentNavigation(fragmentNavigator)
         setAdapter()
-
+        binding.veilRecyclerLayout.veil()
         viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -83,13 +85,12 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
                     list?.let {
 
                         vehicleType?.let {
-                            binding.loadingLayout.realLayout.visibility = View.GONE
-                            binding.mainRecyclerView.visibility = View.VISIBLE
                             mainAdapter.submitCarMarcasModel(
                                 list,
                                 vehicleType!!,
                                 this@MainFragment
                             )
+                            binding.veilRecyclerLayout.unVeil()
                         }
                         Timber.tag("Gelen Data: ").d("${it.size}")
 
@@ -179,13 +180,10 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
 
     private fun setAdapter() {
 
-        binding.mainRecyclerView.apply {
-
-            adapter = mainAdapter
-            layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            hasFixedSize()
-
+        binding.apply {
+            veilRecyclerLayout.setAdapter(mainAdapter)
+            veilRecyclerLayout.setLayoutManager(LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false))
+            veilRecyclerLayout.addVeiledItems(10)
         }
     }
 

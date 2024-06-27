@@ -10,17 +10,16 @@ import androidx.viewbinding.ViewBinding
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
-
     private var _binding: VB? = null
     protected val binding: VB
         get() = _binding ?: error("fragment view not initialized")
 
     @get:LayoutRes
-    abstract val layoutId: Int
+    protected abstract val layoutId: Int
 
-    abstract fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): VB
+    protected abstract fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): VB
 
-    abstract fun VB.initializeViews()
+    protected abstract fun VB.initializeViews()
 
 
     override fun onCreateView(

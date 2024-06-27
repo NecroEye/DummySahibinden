@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.muratcangzm.dummysahibinden.R
 import com.muratcangzm.dummysahibinden.databinding.DetailsFragmentLayoutBinding
-import com.muratcangzm.dummysahibinden.ui.fragments.core.BaseFragment
+import com.muratcangzm.dummysahibinden.ui.fragments.core.BaseFragmentDataBinding
 import com.muratcangzm.dummysahibinden.viewmodels.DetailsViewModel
 import com.muratcangzm.dummysahibinden.viewmodels.core.ViewModelFactory
 import com.muratcangzm.network.mapper.VehicleType
@@ -23,11 +22,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DetailsFragment : BaseFragment<DetailsFragmentLayoutBinding>() {
-
-    @get:LayoutRes
-    override val layoutId
-        get() = R.layout.details_fragment_layout
+class DetailsFragment : BaseFragmentDataBinding<DetailsFragmentLayoutBinding>() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -42,20 +37,19 @@ class DetailsFragment : BaseFragment<DetailsFragmentLayoutBinding>() {
 
     private val args: DetailsFragmentArgs by navArgs()
 
+    override val layoutId: Int
+        get() = R.layout.details_fragment_layout
+
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.tag("Detail Fragment Coroutine Error").d(throwable.message.toString())
     }
 
-
-    override fun inflateBinding(
+    override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?
-    ): DetailsFragmentLayoutBinding {
-        return DetailsFragmentLayoutBinding.inflate(inflater, container, false)
-    }
-
-    override fun DetailsFragmentLayoutBinding.initializeViews() {
-        //not necessary to use here rn
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,6 +63,8 @@ class DetailsFragment : BaseFragment<DetailsFragmentLayoutBinding>() {
 
         Timber.tag("DetailsFragment").w("Bunlar $date $codigo $marcas $type")
 
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
         viewModel.fetchVehicleDetails(type!!, marcas!!, codigo!!, date!!)
 
@@ -79,18 +75,6 @@ class DetailsFragment : BaseFragment<DetailsFragmentLayoutBinding>() {
                 result?.let {
                     Timber.tag("Details Data").w("Detail Gelen: $it")
 
-                   binding.apply {
-                       binding.loadingScreen.realLayout.visibility = View.GONE
-                       binding.textLayout.visibility = View.VISIBLE
-                       binding.vehicleTitle.text = "Vehicle Information"
-                       binding.brandText.text = result.brand
-                       binding.modelText.text = result.model
-                       binding.valueText.text = result.value
-                       binding.dateText.text = result.modelDate.toString()
-                       binding.fuelTypeText.text = result.fuelType
-                       binding.referenceNameText.text = result.referenceName
-                       binding.fuelTypeCharacterText.text = result.fuelCharType
-                   }
                 }
             }
 

@@ -68,7 +68,7 @@ dependencies {
 
 
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
+    implementation("com.github.skydoves:androidveil:1.1.4")
     kapt("androidx.room:room-compiler:2.6.1")
     kapt("androidx.lifecycle:lifecycle-compiler:2.8.1")
 
