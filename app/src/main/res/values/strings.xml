@@ -8,4 +8,12 @@
     <string name="re_connect_again">Re-connect again</string>
     <string name="leads_to_another_page">leads to another page</string>
     <string name="model_list">Model List</string>
+    <string name="vehicle_information">Vehicle Information</string>
+    <string name="fuel_type_character">Fuel Type Character:</string>
+    <string name="reference_name">Reference Name:</string>
+    <string name="fuel_type">Fuel Type:</string>
+    <string name="date">Date:</string>
+    <string name="value">Value:</string>
+    <string name="model">Model:</string>
+    <string name="brand">Brand:</string>
 </resources>
