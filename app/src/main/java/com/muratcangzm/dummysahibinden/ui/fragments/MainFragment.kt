@@ -28,6 +28,7 @@ import com.muratcangzm.dummysahibinden.viewmodels.MainViewModel
 import com.muratcangzm.dummysahibinden.viewmodels.core.ViewModelFactory
 import com.muratcangzm.network.mapper.VehicleType
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -64,6 +65,8 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
         return MainFragmentLayoutBinding.inflate(inflater, container, false)
     }
 
+
+
     override fun MainFragmentLayoutBinding.initializeViews() {
         //Not necessary in this fragment rn
 
@@ -77,7 +80,9 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
         binding.veilRecyclerLayout.veil()
         viewModel.fetchVehicleYearList(VehicleType.carros, 59, 5940)
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        showVehicleDialog()
+
+        viewLifecycleOwner.lifecycleScope.launch{
 
             launch {
                 viewModel.vehicleData.collectLatest { list ->
@@ -157,9 +162,7 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
         }
     }
 
-    private fun showNetworkDialog() {
-
-        if (!::networkDialog.isInitialized || !networkDialog.isShowing) {
+    override fun networkDialog() {
             networkDialog = Dialog(requireContext())
             networkDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             networkDialog.setCancelable(false)
@@ -175,8 +178,8 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
                 }
             }
             networkDialog.show()
-        }
     }
+
 
     private fun setAdapter() {
 
@@ -190,21 +193,11 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
     override fun onStart() {
         super.onStart()
 
-        networkChangeReceiver = NetworkListener { isConnected ->
-
-            if (isConnected) {
-                showVehicleDialog()
-            } else {
-                showNetworkDialog()
-            }
-        }
-
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        requireContext().registerReceiver(networkChangeReceiver, filter)
     }
 
     override fun onStop() {
         super.onStop()
+        if(::networkChangeReceiver.isInitialized)
         requireContext().unregisterReceiver(networkChangeReceiver)
     }
 
@@ -212,9 +205,6 @@ class MainFragment : BaseFragment<MainFragmentLayoutBinding>() {
         super.onDestroyView()
 
         if (::vehicleDialog.isInitialized && vehicleDialog.isShowing)
-            vehicleDialog.dismiss()
-
-        if (::networkDialog.isInitialized && networkDialog.isShowing)
             vehicleDialog.dismiss()
 
 
