@@ -5,10 +5,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.muratcangzm.dummysahibinden.R
 import com.muratcangzm.dummysahibinden.common.navigation.FragmentNavigator
 import com.muratcangzm.dummysahibinden.databinding.MainAdapterLayoutBinding
 import com.muratcangzm.model.CarMarcasModel
@@ -33,11 +35,12 @@ constructor(@ApplicationContext private val context: Context) :
 
     companion object {
         private const val VIEW_TYPE_ITEM = 1
+        private const val TAG = "MainAdapter"
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainHolder {
 
-        binding = MainAdapterLayoutBinding.inflate(LayoutInflater.from(context), parent, false)
+        binding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.main_adapter_layout, parent, false)
 
         return MainHolder()
     }
@@ -53,6 +56,9 @@ constructor(@ApplicationContext private val context: Context) :
 
     override fun onBindViewHolder(holder: MainHolder, position: Int) {
         holder.setData(mutableCarsModel[position], vehicleType)
+
+        binding.carMarcas = mutableCarsModel[position]
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -100,7 +106,6 @@ constructor(@ApplicationContext private val context: Context) :
                     VehicleType.caminhoes -> binding.vehicleType.text = "Truck Brand: "
                 }
 
-                binding.vehicleNameHolderText.text = data.name.trim()
 
                 binding.cardLayout.setOnClickListener {
 
